@@ -1,0 +1,348 @@
+import { users, pets, appointments, getPetsByOwner, getAppointmentsByOwner } from "./data.js";
+
+// ---------- Theme toggle ----------
+const themeToggle = document.getElementById("themeToggle");
+if (themeToggle) {
+  const current = localStorage.getItem("theme") || "dark";
+  document.documentElement.setAttribute("data-theme", current);
+  themeToggle.textContent = current === "dark" ? "☀️ Light Mode" : "🌙 Dark Mode";
+  themeToggle.addEventListener("click", () => {
+    const newTheme = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", newTheme);
+    localStorage.setItem("theme", newTheme);
+    themeToggle.textContent = newTheme === "dark" ? "☀️ Light Mode" : "🌙 Dark Mode";
+  });
+}
+
+// ---------- Navigation Logic ----------
+const contentContainer = document.getElementById("appContent");
+const pageTitle = document.getElementById("pageTitle");
+const navButtons = document.querySelectorAll(".nav-btn");
+
+let currentOwnerId = null; // Track logged in owner ID
+
+navButtons.forEach(btn => {
+  btn.addEventListener("click", () => {
+    // Update active state
+    navButtons.forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+
+    const view = btn.dataset.view;
+    pageTitle.textContent = btn.textContent; // Update topbar title
+    renderView(view);
+  });
+});
+
+// Initial render
+renderView("admin-login");
+
+function renderView(view) {
+  contentContainer.innerHTML = ""; // Clear current view
+  
+  switch (view) {
+    // Admin Views
+    case "admin-login": return renderAdminLogin();
+    case "admin-pets": return renderPetManagement();
+    case "admin-appointments": return renderAppointmentManagement();
+    case "admin-users": return renderUserManagement();
+    case "admin-reports": return renderReports();
+    
+    // Owner Views
+    case "owner-register": return renderOwnerRegistration();
+    case "owner-login": return renderOwnerLogin();
+    case "owner-pet-reg": return renderPetRegistration();
+    case "owner-view-pets": return renderOwnerPets();
+    case "owner-book-appt": return renderBooking();
+    case "owner-status": return renderAppointmentStatus();
+    case "owner-history": return renderBookingHistory();
+    case "owner-profile": return renderProfileManagement();
+    
+    default: contentContainer.innerHTML = `<p>View not found.</p>`;
+  }
+}
+
+// ---------- Admin Renderers ----------
+function renderAdminLogin() {
+  contentContainer.innerHTML = `
+    <div class="card">
+      <form id="adminLoginForm">
+        <label>Username <input type="text" name="username" required /></label>
+        <label>Password <input type="password" name="password" required /></label>
+        <button type="submit" class="btn primary">Login</button>
+      </form>
+    </div>`;
+  document.getElementById("adminLoginForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const data = new FormData(e.target);
+    const u = data.get("username"), p = data.get("password");
+    const admin = users.find(user => user.role === "admin" && user.username === u && user.password === p);
+    if (admin) {
+      alert(`Welcome Admin ${u}!`);
+      // Unhide secure admin tabs
+      document.querySelectorAll('.auth-admin').forEach(el => el.style.display = 'block');
+      // Go through to Pet Management view
+      const petBtn = document.querySelector('[data-view="admin-pets"]');
+      if(petBtn) petBtn.click();
+    } else {
+      alert("Invalid credentials");
+    }
+  });
+}
+
+function renderPetManagement() {
+  const rows = pets.map(p => `<tr><td>${p.id}</td><td>${p.ownerId}</td><td>${p.name}</td><td>${p.species}</td><td>${p.breed}</td><td>${p.age}</td></tr>`).join("");
+  contentContainer.innerHTML = `
+    <div class="card">
+      <table class="table">
+        <thead><tr><th>ID</th><th>Owner ID</th><th>Name</th><th>Species</th><th>Breed</th><th>Age</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <div class="card">
+      <h2>Add New Pet</h2>
+      <form id="addPetForm">
+        <label>Owner ID <input type="number" name="ownerId" required /></label>
+        <label>Name <input type="text" name="name" required /></label>
+        <label>Species <input type="text" name="species" required /></label>
+        <label>Breed <input type="text" name="breed" required /></label>
+        <label>Age <input type="number" name="age" required /></label>
+        <button type="submit" class="btn secondary">Add Pet</button>
+      </form>
+    </div>`;
+  document.getElementById("addPetForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const f = new FormData(e.target);
+    pets.push({ id: pets.length + 1, ownerId: Number(f.get("ownerId")), name: f.get("name"), species: f.get("species"), breed: f.get("breed"), age: Number(f.get("age")) });
+    alert("Pet added!");
+    renderPetManagement(); // Re-render table
+  });
+}
+
+function renderAppointmentManagement() {
+  const rows = appointments.map(a => `<tr><td>${a.id}</td><td>${a.petId}</td><td>${a.ownerId}</td><td>${a.date}</td><td>${a.time}</td><td>${a.status}</td><td>${a.reason}</td></tr>`).join("");
+  contentContainer.innerHTML = `
+    <div class="card">
+      <table class="table">
+        <thead><tr><th>ID</th><th>Pet ID</th><th>Owner ID</th><th>Date</th><th>Time</th><th>Status</th><th>Reason</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <div class="card">
+      <h2>Schedule New Appointment</h2>
+      <form id="addApptForm">
+        <label>Pet ID <input type="number" name="petId" required /></label>
+        <label>Owner ID <input type="number" name="ownerId" required /></label>
+        <label>Date <input type="date" name="date" required /></label>
+        <label>Time <input type="time" name="time" required /></label>
+        <label>Status <select name="status"><option>Scheduled</option><option>Completed</option><option>Cancelled</option></select></label>
+        <label>Reason <input type="text" name="reason" required /></label>
+        <button type="submit" class="btn secondary">Add Appointment</button>
+      </form>
+    </div>`;
+  document.getElementById("addApptForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const f = new FormData(e.target);
+    appointments.push({ id: appointments.length + 1, petId: Number(f.get("petId")), ownerId: Number(f.get("ownerId")), date: f.get("date"), time: f.get("time"), status: f.get("status"), reason: f.get("reason") });
+    alert("Appointment added!");
+    renderAppointmentManagement();
+  });
+}
+
+function renderUserManagement() {
+  const rows = users.map(u => `<tr><td>${u.id}</td><td>${u.role}</td><td>${u.username}</td></tr>`).join("");
+  contentContainer.innerHTML = `
+    <div class="card">
+      <table class="table">
+        <thead><tr><th>ID</th><th>Role</th><th>Username</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+}
+
+function renderReports() {
+  contentContainer.innerHTML = `
+    <div class="card">
+      <h2>Appointments Overview</h2>
+      <div class="chart-container">
+        <canvas id="reportsChart"></canvas>
+      </div>
+    </div>`;
+  
+  const counts = {};
+  appointments.forEach(a => {
+    counts[a.date] = (counts[a.date] || 0) + 1;
+  });
+  const labels = Object.keys(counts).sort();
+  const data = labels.map(d => counts[d]);
+  
+  const ctx = document.getElementById('reportsChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Appointments per Day',
+        data,
+        backgroundColor: 'rgba(47, 216, 178, 0.7)',
+        borderColor: '#2fd8b2',
+        borderWidth: 1,
+        borderRadius: 4
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { labels: { color: getComputedStyle(document.body).getPropertyValue('--color-text') } } },
+      scales: {
+        x: { ticks: { color: '#bbb' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+        y: { beginAtZero: true, ticks: { color: '#bbb', stepSize: 1 }, grid: { color: 'rgba(255,255,255,0.1)' } }
+      }
+    }
+  });
+}
+
+// ---------- Owner Renderers ----------
+function renderOwnerRegistration() {
+  contentContainer.innerHTML = `
+    <div class="card">
+      <form id="ownerRegForm">
+        <label>Username <input type="text" name="username" required /></label>
+        <label>Password <input type="password" name="password" required /></label>
+        <button type="submit" class="btn primary">Register</button>
+      </form>
+    </div>`;
+  document.getElementById("ownerRegForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const f = new FormData(e.target);
+    users.push({ id: users.length + 1, role: "owner", username: f.get("username"), password: f.get("password") });
+    alert("Registration successful. Please login.");
+  });
+}
+
+function renderOwnerLogin() {
+  contentContainer.innerHTML = `
+    <div class="card">
+      <form id="ownerLoginForm">
+        <label>Username <input type="text" name="username" required /></label>
+        <label>Password <input type="password" name="password" required /></label>
+        <button type="submit" class="btn primary">Login</button>
+      </form>
+    </div>`;
+  document.getElementById("ownerLoginForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const f = new FormData(e.target);
+    const u = f.get("username"), p = f.get("password");
+    const owner = users.find(user => user.role === "owner" && user.username === u && user.password === p);
+    if (owner) {
+      currentOwnerId = owner.id;
+      alert(`Welcome ${u}! You are now logged in.`);
+      // Unhide secure owner tabs
+      document.querySelectorAll('.auth-owner').forEach(el => el.style.display = 'block');
+      // Go through to View Pets view
+      const viewPetsBtn = document.querySelector('[data-view="owner-view-pets"]');
+      if(viewPetsBtn) viewPetsBtn.click();
+    } else {
+      alert("Invalid credentials");
+    }
+  });
+}
+
+function checkLogin() {
+  if (!currentOwnerId) {
+    contentContainer.innerHTML = `<div class="card"><p>Please login first.</p></div>`;
+    return false;
+  }
+  return true;
+}
+
+function renderPetRegistration() {
+  if (!checkLogin()) return;
+  contentContainer.innerHTML = `
+    <div class="card">
+      <form id="petRegForm">
+        <label>Name <input type="text" name="name" required /></label>
+        <label>Species <input type="text" name="species" required /></label>
+        <label>Breed <input type="text" name="breed" required /></label>
+        <label>Age <input type="number" name="age" required /></label>
+        <button type="submit" class="btn secondary">Add Pet</button>
+      </form>
+    </div>`;
+  document.getElementById("petRegForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const f = new FormData(e.target);
+    pets.push({ id: pets.length + 1, ownerId: currentOwnerId, name: f.get("name"), species: f.get("species"), breed: f.get("breed"), age: Number(f.get("age")) });
+    alert("Pet registered!");
+  });
+}
+
+function renderOwnerPets() {
+  if (!checkLogin()) return;
+  const myPets = getPetsByOwner(currentOwnerId);
+  const rows = myPets.map(p => `<tr><td>${p.id}</td><td>${p.name}</td><td>${p.species}</td><td>${p.breed}</td><td>${p.age}</td></tr>`).join("");
+  contentContainer.innerHTML = `
+    <div class="card">
+      <table class="table">
+        <thead><tr><th>ID</th><th>Name</th><th>Species</th><th>Breed</th><th>Age</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+}
+
+function renderBooking() {
+  if (!checkLogin()) return;
+  const myPets = getPetsByOwner(currentOwnerId);
+  const petOptions = myPets.map(p => `<option value="${p.id}">${p.name}</option>`).join("");
+  contentContainer.innerHTML = `
+    <div class="card">
+      <form id="bookingForm">
+        <label>Pet <select name="petId" required>${petOptions}</select></label>
+        <label>Date <input type="date" name="date" required /></label>
+        <label>Time <input type="time" name="time" required /></label>
+        <label>Reason <input type="text" name="reason" required /></label>
+        <button type="submit" class="btn primary">Book Appointment</button>
+      </form>
+    </div>`;
+  document.getElementById("bookingForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const f = new FormData(e.target);
+    appointments.push({ id: appointments.length + 1, petId: Number(f.get("petId")), ownerId: currentOwnerId, date: f.get("date"), time: f.get("time"), status: "Scheduled", reason: f.get("reason") });
+    alert("Appointment booked!");
+  });
+}
+
+function renderAppointmentStatus() {
+  if (!checkLogin()) return;
+  const myAppts = getAppointmentsByOwner(currentOwnerId);
+  const rows = myAppts.map(a => `<tr><td>${a.id}</td><td>${a.petId}</td><td>${a.date}</td><td>${a.time}</td><td><span style="color:var(--color-primary);">${a.status}</span></td></tr>`).join("");
+  contentContainer.innerHTML = `
+    <div class="card">
+      <table class="table">
+        <thead><tr><th>ID</th><th>Pet ID</th><th>Date</th><th>Time</th><th>Status</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+}
+
+function renderBookingHistory() {
+  renderAppointmentStatus(); // Shared logic for prototype simplicity
+}
+
+function renderProfileManagement() {
+  if (!checkLogin()) return;
+  const owner = users.find(u => u.id === currentOwnerId);
+  contentContainer.innerHTML = `
+    <div class="card">
+      <p><strong>Username:</strong> ${owner.username}</p>
+      <p><strong>Role:</strong> ${owner.role}</p>
+      <hr style="border:1px solid rgba(255,255,255,0.05); margin: 1rem 0;">
+      <h3>Change Password</h3>
+      <form id="pwdForm">
+        <label>New Password <input type="password" name="newPwd" required /></label>
+        <button type="submit" class="btn secondary">Update Password</button>
+      </form>
+    </div>`;
+  document.getElementById("pwdForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    owner.password = new FormData(e.target).get("newPwd");
+    alert("Password updated.");
+  });
+}

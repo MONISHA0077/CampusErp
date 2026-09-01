@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PetCare – Prototype</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <img src="assets/logo.svg" alt="PetCare" class="logo" />
+        <h2 class="brand">PetCare</h2>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <h3>Admin Module</h3>
+          <button class="nav-btn active" data-view="admin-login">Admin Login</button>
+          <button class="nav-btn auth-admin" style="display: none;" data-view="admin-pets">Pet Management</button>
+          <button class="nav-btn auth-admin" style="display: none;" data-view="admin-appointments">Appointment Management</button>
+          <button class="nav-btn auth-admin" style="display: none;" data-view="admin-users">User Management</button>
+          <button class="nav-btn auth-admin" style="display: none;" data-view="admin-reports">Reports Management</button>
+        </div>
+        <div class="nav-section">
+          <h3>Pet Owner Module</h3>
+          <button class="nav-btn" data-view="owner-register">User Registration</button>
+          <button class="nav-btn" data-view="owner-login">User Login</button>
+          <button class="nav-btn auth-owner" style="display: none;" data-view="owner-pet-reg">Pet Registration</button>
+          <button class="nav-btn auth-owner" style="display: none;" data-view="owner-view-pets">View Pet Details</button>
+          <button class="nav-btn auth-owner" style="display: none;" data-view="owner-book-appt">Appointment Booking</button>
+          <button class="nav-btn auth-owner" style="display: none;" data-view="owner-status">Appointment Status</button>
+          <button class="nav-btn auth-owner" style="display: none;" data-view="owner-history">Booking History</button>
+          <button class="nav-btn auth-owner" style="display: none;" data-view="owner-profile">Profile Management</button>
+        </div>
+      </nav>
+      <div class="sidebar-footer">
+        <button id="themeToggle" class="theme-toggle">🌙 Toggle Theme</button>
+      </div>
+    </aside>
+    <main class="main-area">
+      <header class="topbar">
+        <h1 id="pageTitle">Admin Login</h1>
+      </header>
+      <div class="content-container" id="appContent">
+        <!-- Dynamic content goes here -->
+      </div>
+    </main>
+  </div>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
