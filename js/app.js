@@ -64,13 +64,71 @@ function renderView(view) {
 // ---------- Admin Renderers ----------
 function renderAdminLogin() {
   contentContainer.innerHTML = `
-    <div class="card">
-      <form id="adminLoginForm">
-        <label>Username <input type="text" name="username" required /></label>
-        <label>Password <input type="password" name="password" required /></label>
-        <button type="submit" class="btn primary">Login</button>
-      </form>
-    </div>`;
+    <section class="admin-login-view">
+      <div class="login-dashboard">
+        <div class="dashboard-hero">
+          <p class="eyebrow">PetCare Admin</p>
+          <h2>Clinic Dashboard Login</h2>
+          <p>Sign in to manage pets, owners, bookings, and care reports from one place.</p>
+        </div>
+        <div class="dashboard-stats">
+          <div class="stat-card">
+            <span>${pets.length}</span>
+            <p>Pets</p>
+          </div>
+          <div class="stat-card">
+            <span>${users.filter(user => user.role === "owner").length}</span>
+            <p>Owners</p>
+          </div>
+          <div class="stat-card">
+            <span>${appointments.length}</span>
+            <p>Bookings</p>
+          </div>
+        </div>
+        <div class="card login-panel">
+          <form id="adminLoginForm">
+            <label>Username <input type="text" name="username" placeholder="admin1" required /></label>
+            <label>Password <input type="password" name="password" placeholder="admin123" required /></label>
+            <button type="submit" class="btn primary">Login</button>
+          </form>
+        </div>
+      </div>
+      <div class="card activity-panel">
+        <div class="activity-heading">
+          <p class="eyebrow">Live Preview</p>
+          <h2>Pet owner cards</h2>
+        </div>
+        <div class="people-card-grid" aria-label="Pet owner highlights">
+          <article class="person-card">
+            <img src="https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=500&q=80" alt="Bella the Labrador" />
+            <div>
+              <span class="status-pill">Vaccinated</span>
+              <h3>Jane Doe</h3>
+              <p>Bella and Charlie are booked for grooming and wellness visits.</p>
+              <strong>2 pets</strong>
+            </div>
+          </article>
+          <article class="person-card">
+            <img src="https://images.unsplash.com/photo-1518791841217-8f162f1e1131?auto=format&fit=crop&w=500&q=80" alt="Milo the Siamese cat" />
+            <div>
+              <span class="status-pill">Follow-up</span>
+              <h3>John Smith</h3>
+              <p>Milo, Luna, and Rocky have active care records in the clinic.</p>
+              <strong>3 pets</strong>
+            </div>
+          </article>
+          <article class="person-card">
+            <img src="https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=500&q=80" alt="Daisy the dog" />
+            <div>
+              <span class="status-pill">Scheduled</span>
+              <h3>Moni</h3>
+              <p>Daisy, Max, Chloe, Simba, and Buster have upcoming appointments.</p>
+              <strong>5 pets</strong>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>`;
   document.getElementById("adminLoginForm").addEventListener("submit", (e) => {
     e.preventDefault();
     const data = new FormData(e.target);
