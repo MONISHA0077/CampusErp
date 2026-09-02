@@ -1,53 +1,79 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PetCare – Prototype</title>
+  <title>PetCare Campus ERP</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
   <div class="app-layout">
+    <!-- Sidebar -->
     <aside class="sidebar">
       <div class="sidebar-header">
-        <img src="assets/logo.svg" alt="PetCare" class="logo" />
-        <h2 class="brand">PetCare</h2>
+        <div class="logo-icon">
+          <i class="fa-solid fa-paw"></i>
+        </div>
+        <div class="brand-text">
+          <h2>PetCare</h2>
+          <span class="badge-mini">ERP v2.0</span>
+        </div>
       </div>
+      
       <nav class="sidebar-nav">
         <div class="nav-section">
-          <h3>Admin Module</h3>
-          <button class="nav-btn active" data-view="admin-login">Admin Login</button>
-          <button class="nav-btn auth-admin" style="display: none;" data-view="admin-pets">Pet Management</button>
-          <button class="nav-btn auth-admin" style="display: none;" data-view="admin-appointments">Appointment Management</button>
-          <button class="nav-btn auth-admin" style="display: none;" data-view="admin-users">User Management</button>
-          <button class="nav-btn auth-admin" style="display: none;" data-view="admin-reports">Reports Management</button>
+          <h3><i class="fa-solid fa-user-shield"></i> Admin Module</h3>
+          <button class="nav-btn active" data-view="admin-login"><i class="fa-solid fa-right-to-bracket"></i> Admin Login</button>
+          <button class="nav-btn auth-admin" style="display: none;" data-view="admin-pets"><i class="fa-solid fa-dog"></i> Pet Management</button>
+          <button class="nav-btn auth-admin" style="display: none;" data-view="admin-appointments"><i class="fa-solid fa-calendar-check"></i> Appointments</button>
+          <button class="nav-btn auth-admin" style="display: none;" data-view="admin-users"><i class="fa-solid fa-users-gear"></i> User Directory</button>
+          <button class="nav-btn auth-admin" style="display: none;" data-view="admin-reports"><i class="fa-solid fa-chart-pie"></i> Analytics & Reports</button>
         </div>
+        
         <div class="nav-section">
-          <h3>Pet Owner Module</h3>
-          <button class="nav-btn" data-view="owner-register">User Registration</button>
-          <button class="nav-btn" data-view="owner-login">User Login</button>
-          <button class="nav-btn auth-owner" style="display: none;" data-view="owner-pet-reg">Pet Registration</button>
-          <button class="nav-btn auth-owner" style="display: none;" data-view="owner-view-pets">View Pet Details</button>
-          <button class="nav-btn auth-owner" style="display: none;" data-view="owner-book-appt">Appointment Booking</button>
-          <button class="nav-btn auth-owner" style="display: none;" data-view="owner-status">Appointment Status</button>
-          <button class="nav-btn auth-owner" style="display: none;" data-view="owner-history">Booking History</button>
-          <button class="nav-btn auth-owner" style="display: none;" data-view="owner-profile">Profile Management</button>
+          <h3><i class="fa-solid fa-heart-pulse"></i> Pet Owner Module</h3>
+          <button class="nav-btn" data-view="owner-register"><i class="fa-solid fa-user-plus"></i> Registration</button>
+          <button class="nav-btn" data-view="owner-login"><i class="fa-solid fa-key"></i> User Login</button>
+          <button class="nav-btn auth-owner" style="display: none;" data-view="owner-pet-reg"><i class="fa-solid fa-plus-circle"></i> Add New Pet</button>
+          <button class="nav-btn auth-owner" style="display: none;" data-view="owner-view-pets"><i class="fa-solid fa-bone"></i> My Pets</button>
+          <button class="nav-btn auth-owner" style="display: none;" data-view="owner-book-appt"><i class="fa-solid fa-calendar-plus"></i> Book Visit</button>
+          <button class="nav-btn auth-owner" style="display: none;" data-view="owner-status"><i class="fa-solid fa-clock-rotate-left"></i> Visit Status</button>
+          <button class="nav-btn auth-owner" style="display: none;" data-view="owner-history"><i class="fa-solid fa-file-invoice"></i> Booking History</button>
+          <button class="nav-btn auth-owner" style="display: none;" data-view="owner-profile"><i class="fa-solid fa-id-card"></i> My Profile</button>
         </div>
       </nav>
+
       <div class="sidebar-footer">
-        <button id="themeToggle" class="theme-toggle">🌙 Toggle Theme</button>
+        <div id="userBadge" class="user-badge-container" style="display: none;">
+          <div class="user-avatar" id="userAvatar">A</div>
+          <div class="user-info">
+            <span class="user-name" id="userName">User</span>
+            <span class="user-role" id="userRole">Role</span>
+          </div>
+          <button id="logoutBtn" class="icon-btn-danger" title="Logout"><i class="fa-solid fa-power-off"></i></button>
+        </div>
+        <button id="themeToggle" class="theme-toggle"><i class="fa-solid fa-moon"></i> Toggle Theme</button>
       </div>
     </aside>
+
+    <!-- Main Content Area -->
     <main class="main-area">
       <header class="topbar">
-        <h1 id="pageTitle">Admin Login</h1>
+        <div class="topbar-title">
+          <h1 id="pageTitle">Admin Login</h1>
+          <p class="subtitle" id="pageSubtitle">Access system administration and pet management portal</p>
+        </div>
+        <div class="topbar-actions">
+          <span class="live-pill"><i class="fa-solid fa-circle-dot"></i> Live System</span>
+        </div>
       </header>
       <div class="content-container" id="appContent">
-        <!-- Dynamic content goes here -->
+        <!-- Dynamic content rendered via JS -->
       </div>
       <footer class="app-footer">
         <div class="footer-content">
@@ -83,6 +109,10 @@
       </footer>
     </main>
   </div>
-  <script src="js/app.js"></script>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <script type="module" src="js/app.js"></script>
 </body>
 </html>
